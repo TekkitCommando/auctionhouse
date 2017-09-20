@@ -1,0 +1,4 @@
+name: ${project.artifactId}
+main: me.tekkitcommando.auctionhouse.AuctionHouse
+version: ${project.version}
+authors: [TekkitCommando]
