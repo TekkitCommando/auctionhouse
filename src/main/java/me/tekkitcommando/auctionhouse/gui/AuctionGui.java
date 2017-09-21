@@ -47,6 +47,7 @@ public class AuctionGui {
 
                     for (int slot = 0; slot <= 44; slot++)
                         setInventoryItem(inv, slot, jedis);
+
                 }
 
                 // Add arrows too.
