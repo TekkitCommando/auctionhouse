@@ -1,5 +1,7 @@
 package me.tekkitcommando.auctionhouse;
 
+import net.milkbowl.vault.economy.Economy;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import redis.clients.jedis.JedisPool;
 
@@ -9,10 +11,17 @@ public class AuctionHouse extends JavaPlugin {
 
     private Logger logger;
     private static JedisPool pool;
+    private static Economy econ = null;
 
     @Override
     public void onEnable() {
         logger = getLogger();
+
+        logger.info("[Auction House] Setting up economy...");
+        if (!setEcon()) {
+            logger.warning("[Auction House] Economy could not be setup! Shutting down plugin!");
+            getServer().getPluginManager().disablePlugin(this);
+        }
 
         logger.info("[Auction House] Starting jedis pool...");
         pool = new JedisPool("localhost");
@@ -28,5 +37,21 @@ public class AuctionHouse extends JavaPlugin {
 
     public static JedisPool getPool() {
         return pool;
+    }
+
+    public static Economy getEcon() {
+        return econ;
+    }
+
+    private boolean setEcon() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
     }
 }
