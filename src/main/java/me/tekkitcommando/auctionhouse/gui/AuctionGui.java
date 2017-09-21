@@ -22,7 +22,7 @@ public class AuctionGui {
     public static void openAuctionGui(Player player, int page) {
         Inventory inv = Bukkit.createInventory(null, 27, ChatColor.GREEN + "Auction House");
 
-        try (Jedis jedis = AuctionHouse.getPool().getResource()){
+        try (Jedis jedis = AuctionHouse.getPool().getResource()) {
             jedis.auth("the-password");
 
             for (String key : jedis.keys("*")) {
@@ -38,7 +38,7 @@ public class AuctionGui {
                     setInventoryItem(inv, slot, jedis);
 
             } else {
-                if(page > 1) {
+                if (page > 1) {
 
                     for (int slot = 44 + page; slot <= 44 * page; slot++)
                         setInventoryItem(inv, slot, jedis);
@@ -60,8 +60,8 @@ public class AuctionGui {
      * Sets the gui slot the correct item based on the values retrieved
      * from the key in the redis database
      *
-     * @param inv The gui to set the item in
-     * @param slot The slot where the item will be
+     * @param inv   The gui to set the item in
+     * @param slot  The slot where the item will be
      * @param jedis The instance of jedis for retrieving values from the database
      */
     private static void setInventoryItem(Inventory inv, int slot, Jedis jedis) {

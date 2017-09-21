@@ -27,7 +27,7 @@ public class AuctionListener implements Listener {
 
                 if (auctionItem != null) {
 
-                    if(purchaseItem(buyer, auctionItem)) {
+                    if (purchaseItem(buyer, auctionItem)) {
                         sellItem(auctionItem);
                         AuctionItemManager.removeAuctionItem(auctionItem);
                     }
@@ -40,7 +40,7 @@ public class AuctionListener implements Listener {
      * Checks if player has enough money and if he or she does then
      * take the money and give him or her the item
      *
-     * @param buyer The buyer of the item
+     * @param buyer       The buyer of the item
      * @param auctionItem The item being auctioned
      */
     private boolean purchaseItem(Player buyer, AuctionItem auctionItem) {

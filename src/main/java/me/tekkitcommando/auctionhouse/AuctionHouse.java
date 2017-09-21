@@ -9,9 +9,17 @@ import java.util.logging.Logger;
 
 public class AuctionHouse extends JavaPlugin {
 
-    private Logger logger;
     private static JedisPool pool;
     private static Economy econ = null;
+    private Logger logger;
+
+    public static JedisPool getPool() {
+        return pool;
+    }
+
+    public static Economy getEcon() {
+        return econ;
+    }
 
     @Override
     public void onEnable() {
@@ -33,14 +41,6 @@ public class AuctionHouse extends JavaPlugin {
     @Override
     public void onDisable() {
         logger.info("[Auction House] Saving auction data...");
-    }
-
-    public static JedisPool getPool() {
-        return pool;
-    }
-
-    public static Economy getEcon() {
-        return econ;
     }
 
     private boolean setEcon() {

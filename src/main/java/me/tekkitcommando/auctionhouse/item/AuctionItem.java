@@ -5,11 +5,11 @@ import org.bukkit.inventory.ItemStack;
 
 public class AuctionItem {
 
-     private ItemStack item;
-     private int id;
-     private int amount;
-     private Player seller;
-     private double price;
+    private ItemStack item;
+    private int id;
+    private int amount;
+    private Player seller;
+    private double price;
 
     public AuctionItem(ItemStack item, int id, int amount, Player seller, double price) {
         this.item = item;
