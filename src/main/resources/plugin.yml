@@ -2,3 +2,10 @@ name: ${project.artifactId}
 main: me.tekkitcommando.auctionhouse.AuctionHouse
 version: ${project.version}
 authors: [TekkitCommando]
+
+depend: [Vault]
+
+commands:
+  auction:
+    usage: /auction [page]
+    aliases: auc

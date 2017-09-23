@@ -18,7 +18,8 @@ public class AuctionCommand implements CommandExecutor {
                 AuctionGui.openAuctionGui(player, 1);
             } else if (cmd.getName().equalsIgnoreCase("auction") && args.length > 0) {
                 if (NumberUtils.isNumber(args[0])) {
-                    AuctionGui.openAuctionGui(player, Integer.parseInt(args[0]));
+                    int page = Integer.parseInt(args[0]);
+                    AuctionGui.openAuctionGui(player, page);
                 } else {
                     player.sendMessage(ChatColor.RED + "[Auction House] Incorrect arguments!\n Proper format: /auction <page>");
                 }

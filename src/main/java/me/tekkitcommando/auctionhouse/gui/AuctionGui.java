@@ -46,6 +46,7 @@ public class AuctionGui {
                 }
             }
             setControlButtons(inv);
+            player.openInventory(inv);
 
             RedisManager.getJedis().close();
         } catch (JedisException e) {

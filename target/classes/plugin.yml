@@ -2,3 +2,10 @@ name: auction-house
 main: me.tekkitcommando.auctionhouse.AuctionHouse
 version: 1.0.0-SNAPSHOT
 authors: [TekkitCommando]
+
+depend: [Vault]
+
+commands:
+  auction:
+    usage: /auction [page]
+    aliases: auc
