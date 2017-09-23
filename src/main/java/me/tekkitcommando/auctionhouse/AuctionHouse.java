@@ -1,57 +1,58 @@
 package me.tekkitcommando.auctionhouse;
 
+import me.tekkitcommando.auctionhouse.auction.AuctionManager;
+import me.tekkitcommando.auctionhouse.redis.RedisManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import redis.clients.jedis.JedisPool;
 
 import java.util.logging.Logger;
 
 public class AuctionHouse extends JavaPlugin {
 
-    private static JedisPool pool;
-    private static Economy econ = null;
+    private static Economy economy = null;
     private Logger logger;
 
-    public static JedisPool getPool() {
-        return pool;
+    /**
+     * Allows access to the economy instance
+     *
+     * @return the economy instance
+     */
+    public static Economy getEconomy() {
+        return economy;
     }
 
-    public static Economy getEcon() {
-        return econ;
+    private void setEconomy() {
+        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (economyProvider != null) {
+            economy = economyProvider.getProvider();
+        } else {
+            logger.warning("Could not hook into Vault!");
+        }
     }
 
+    /**
+     * Handles the enabling of the plugin when the server is started
+     */
     @Override
     public void onEnable() {
         logger = getLogger();
 
         logger.info("[Auction House] Setting up economy...");
-        if (!setEcon()) {
-            logger.warning("[Auction House] Economy could not be setup! Shutting down plugin!");
-            getServer().getPluginManager().disablePlugin(this);
-        }
+        setEconomy();
 
-        logger.info("[Auction House] Starting jedis pool...");
-        pool = new JedisPool("localhost");
+        logger.info("[Auction House] Setting up redis...");
+        RedisManager.setupRedis();
 
         logger.info("[Auction House] Loading auction data...");
-
+        AuctionManager.getItemsFromDatabase();
     }
 
+    /**
+     * Handles the disabling of the plugin when the server is stopped
+     */
     @Override
     public void onDisable() {
         logger.info("[Auction House] Saving auction data...");
-    }
-
-    private boolean setEcon() {
-        if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            return false;
-        }
-        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) {
-            return false;
-        }
-        econ = rsp.getProvider();
-        return econ != null;
     }
 }

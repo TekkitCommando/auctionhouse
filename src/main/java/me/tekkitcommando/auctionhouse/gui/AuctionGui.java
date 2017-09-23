@@ -1,79 +1,80 @@
 package me.tekkitcommando.auctionhouse.gui;
 
-import me.tekkitcommando.auctionhouse.AuctionHouse;
+import me.tekkitcommando.auctionhouse.auction.AuctionItem;
+import me.tekkitcommando.auctionhouse.auction.AuctionManager;
+import me.tekkitcommando.auctionhouse.redis.RedisManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import redis.clients.jedis.Jedis;
+import redis.clients.jedis.exceptions.JedisException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class AuctionGui {
 
-    private static List<String> redisKeys = new ArrayList<>();
-    private static Jedis jedis;
-
+    /**
+     * Opens the gui for the specified player at the specified page
+     *
+     * @param player Player that will see the gui
+     * @param page   Page of the gui that will be seen
+     */
     public static void openAuctionGui(Player player, int page) {
         Inventory inv = Bukkit.createInventory(null, 27, ChatColor.GREEN + "Auction House");
 
-        try (Jedis jedis = AuctionHouse.getPool().getResource()) {
-            jedis.auth("the-password");
+        try {
 
-            for (String key : jedis.keys("*")) {
+            if (RedisManager.getRedisKeys().size() <= 44) {
 
-                if (!redisKeys.contains(key))
-                    redisKeys.add(key);
-
-            }
-
-            if (redisKeys.size() <= 44) {
-
-                for (int slot = 0; slot < redisKeys.size(); slot++)
-                    setInventoryItem(inv, slot, jedis);
+                for (int slot = 0; slot < RedisManager.getRedisKeys().size(); slot++)
+                    setInventoryItem(inv, slot);
 
             } else {
                 if (page > 1) {
 
                     for (int slot = 44 + page; slot <= 44 * page; slot++)
-                        setInventoryItem(inv, slot, jedis);
+                        setInventoryItem(inv, slot);
 
                 } else {
 
                     for (int slot = 0; slot <= 44; slot++)
-                        setInventoryItem(inv, slot, jedis);
+                        setInventoryItem(inv, slot);
 
                 }
 
                 // Add arrows too.
             }
 
-            jedis.close();
+            RedisManager.getJedis().close();
+        } catch (JedisException e) {
+            e.printStackTrace();
         }
     }
 
     /**
-     * Sets the gui slot the correct item based on the values retrieved
-     * from the key in the redis database
+     * Sets the gui slot to the retrieved Auction Item based on
+     * the slot.
      *
-     * @param inv   The gui to set the item in
-     * @param slot  The slot where the item will be
-     * @param jedis The instance of jedis for retrieving values from the database
+     * @param inv  The gui to set the auction item in
+     * @param slot The slot where the auction item will be
      */
-    private static void setInventoryItem(Inventory inv, int slot, Jedis jedis) {
-        String key = redisKeys.get(slot);
-        Material material = Material.getMaterial(jedis.hget(key, "item"));
-        int amount = Integer.valueOf(jedis.hget(key, "amount"));
+    private static void setInventoryItem(Inventory inv, int slot) {
 
-        ItemStack is = new ItemStack(material, amount);
+        AuctionItem auctionItem = AuctionManager.getAuctionItem(slot);
+        ItemStack is = null;
+
+        if (auctionItem != null) {
+            is = auctionItem.getItem();
+        } else {
+            return;
+        }
 
         ItemMeta im = is.getItemMeta();
-        im.setLore(Arrays.asList("Price: " + jedis.hget(key, "price"), "Seller: " + jedis.hget(key, "seller")));
+        im.setLore(Arrays.asList("ID: " + auctionItem.getId(), "Price: " + auctionItem.getPrice(), "Seller: " + auctionItem.getSeller()));
+
+        is.setItemMeta(im);
 
         inv.setItem(slot, is);
     }

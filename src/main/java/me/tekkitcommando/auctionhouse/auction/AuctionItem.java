@@ -1,4 +1,4 @@
-package me.tekkitcommando.auctionhouse.item;
+package me.tekkitcommando.auctionhouse.auction;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
