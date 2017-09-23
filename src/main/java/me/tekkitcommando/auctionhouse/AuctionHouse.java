@@ -1,6 +1,7 @@
 package me.tekkitcommando.auctionhouse;
 
 import me.tekkitcommando.auctionhouse.auction.AuctionManager;
+import me.tekkitcommando.auctionhouse.command.AuctionCommand;
 import me.tekkitcommando.auctionhouse.redis.RedisManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -31,6 +32,10 @@ public class AuctionHouse extends JavaPlugin {
         }
     }
 
+    private void setupCommands() {
+        getCommand("auction").setExecutor(new AuctionCommand());
+    }
+
     /**
      * Handles the enabling of the plugin when the server is started
      */
@@ -46,6 +51,9 @@ public class AuctionHouse extends JavaPlugin {
 
         logger.info("[Auction House] Loading auction data...");
         AuctionManager.getItemsFromDatabase();
+
+        logger.info("[Auction House] Enabling auction command...");
+        setupCommands();
     }
 
     /**
@@ -54,5 +62,6 @@ public class AuctionHouse extends JavaPlugin {
     @Override
     public void onDisable() {
         logger.info("[Auction House] Saving auction data...");
+        AuctionManager.saveItemsToDatabase();
     }
 }

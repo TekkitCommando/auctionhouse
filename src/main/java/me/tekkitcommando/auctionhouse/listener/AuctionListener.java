@@ -3,6 +3,7 @@ package me.tekkitcommando.auctionhouse.listener;
 import me.tekkitcommando.auctionhouse.AuctionHouse;
 import me.tekkitcommando.auctionhouse.auction.AuctionItem;
 import me.tekkitcommando.auctionhouse.auction.AuctionManager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -62,7 +63,11 @@ public class AuctionListener implements Listener {
      * @param auctionItem The auction being auctioned
      */
     private void sellItem(AuctionItem auctionItem) {
-        AuctionHouse.getEconomy().depositPlayer(auctionItem.getSeller(), auctionItem.getPrice());
-        auctionItem.getSeller().sendMessage(ChatColor.GREEN + "[Auction House] Your auction(s) " + auctionItem.getItem().getItemMeta().getDisplayName() + "was purchased!");
+        AuctionHouse.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(auctionItem.getSeller()), auctionItem.getPrice());
+
+        if (Bukkit.getOfflinePlayer(auctionItem.getSeller()).isOnline()) {
+            Player player = Bukkit.getServer().getPlayer(auctionItem.getSeller());
+            player.sendMessage(ChatColor.GREEN + "[Auction House] Your auction(s) " + auctionItem.getItem().getItemMeta().getDisplayName() + "was purchased!");
+        }
     }
 }

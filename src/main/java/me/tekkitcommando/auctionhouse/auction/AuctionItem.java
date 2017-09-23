@@ -1,17 +1,19 @@
 package me.tekkitcommando.auctionhouse.auction;
 
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.UUID;
 
 public class AuctionItem {
 
     private ItemStack item;
     private int id;
     private int amount;
-    private Player seller;
+    private UUID seller;
+    //    private OfflinePlayer seller;
     private double price;
 
-    public AuctionItem(ItemStack item, int id, int amount, Player seller, double price) {
+    public AuctionItem(ItemStack item, int id, int amount, UUID seller, double price) {
         this.item = item;
         this.id = id;
         this.amount = amount;
@@ -39,11 +41,19 @@ public class AuctionItem {
         this.amount = amount;
     }
 
-    public Player getSeller() {
+//    public OfflinePlayer getSeller() {
+//        return seller;
+//    }
+
+//    public void setSeller(OfflinePlayer seller) {
+//        this.seller = seller;
+//    }
+
+    public UUID getSeller() {
         return seller;
     }
 
-    public void setSeller(Player seller) {
+    public void setSeller(UUID seller) {
         this.seller = seller;
     }
 

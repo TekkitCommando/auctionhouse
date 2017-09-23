@@ -5,6 +5,7 @@ import me.tekkitcommando.auctionhouse.auction.AuctionManager;
 import me.tekkitcommando.auctionhouse.redis.RedisManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -43,9 +44,8 @@ public class AuctionGui {
                         setInventoryItem(inv, slot);
 
                 }
-
-                // Add arrows too.
             }
+            setControlButtons(inv);
 
             RedisManager.getJedis().close();
         } catch (JedisException e) {
@@ -63,7 +63,7 @@ public class AuctionGui {
     private static void setInventoryItem(Inventory inv, int slot) {
 
         AuctionItem auctionItem = AuctionManager.getAuctionItem(slot);
-        ItemStack is = null;
+        ItemStack is;
 
         if (auctionItem != null) {
             is = auctionItem.getItem();
@@ -72,10 +72,31 @@ public class AuctionGui {
         }
 
         ItemMeta im = is.getItemMeta();
-        im.setLore(Arrays.asList("ID: " + auctionItem.getId(), "Price: " + auctionItem.getPrice(), "Seller: " + auctionItem.getSeller()));
+        im.setLore(Arrays.asList("ID: " + auctionItem.getId(), "Price: " + auctionItem.getPrice(), "Seller: " + Bukkit.getPlayer(auctionItem.getSeller()).getName()));
 
         is.setItemMeta(im);
 
         inv.setItem(slot, is);
+    }
+
+    private static void setControlButtons(Inventory inv) {
+        ItemStack prev = new ItemStack(Material.ARROW);
+        ItemMeta prevMeta = prev.getItemMeta();
+        prevMeta.setDisplayName("Previous Page");
+        prev.setItemMeta(prevMeta);
+
+        ItemStack add = new ItemStack(Material.ANVIL);
+        ItemMeta addMeta = add.getItemMeta();
+        addMeta.setDisplayName("Add Auction");
+        add.setItemMeta(addMeta);
+
+        ItemStack next = new ItemStack(Material.ARROW);
+        ItemMeta nextMeta = next.getItemMeta();
+        nextMeta.setDisplayName("Next Page");
+        next.setItemMeta(nextMeta);
+
+        inv.setItem(45, prev);
+        inv.setItem(49, add);
+        inv.setItem(53, next);
     }
 }
