@@ -3,6 +3,7 @@ package me.tekkitcommando.auctionhouse.listener;
 import me.tekkitcommando.auctionhouse.AuctionHouse;
 import me.tekkitcommando.auctionhouse.auction.AuctionItem;
 import me.tekkitcommando.auctionhouse.auction.AuctionManager;
+import me.tekkitcommando.auctionhouse.gui.AuctionGui;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -10,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class AuctionListener implements Listener {
 
@@ -21,17 +23,36 @@ public class AuctionListener implements Listener {
      */
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getInventory().getName().equalsIgnoreCase(ChatColor.stripColor("Auction House"))) {
-            if (event.getCurrentItem().getType() != Material.AIR || event.getCurrentItem() != null) {
-                Player buyer = (Player) event.getWhoClicked();
-                int auctionId = Integer.valueOf(event.getCurrentItem().getItemMeta().getLore().get(0));
-                AuctionItem auctionItem = AuctionManager.getAuctionItem(auctionId);
+        if (event.getInventory().getName().equals(AuctionGui.getInventory().getName())) {
+            ItemStack clicked = event.getCurrentItem();
+            if (clicked.getType() != Material.AIR || clicked.getType() != null) {
+                event.setCancelled(true);
+                if (event.getSlot() != 45 && event.getSlot() != 49 && event.getSlot() != 53) {
+                    Player buyer = (Player) event.getWhoClicked();
+                    int auctionId = Integer.valueOf(event.getCurrentItem().getItemMeta().getLore().get(0));
+                    AuctionItem auctionItem = AuctionManager.getAuctionItem(auctionId);
 
-                if (auctionItem != null) {
+                    if (auctionItem != null) {
 
-                    if (purchaseItem(buyer, auctionItem)) {
-                        sellItem(auctionItem);
-                        AuctionManager.removeAuctionItem(auctionId);
+                        if (purchaseItem(buyer, auctionItem)) {
+                            sellItem(auctionItem);
+                            AuctionManager.removeAuctionItem(auctionId);
+                        }
+                    }
+                } else {
+                    switch (event.getSlot()) {
+                        case 45:
+                        case 53:
+                            int page = Integer.valueOf(event.getCurrentItem().getItemMeta().getDisplayName());
+
+                            event.getWhoClicked().closeInventory();
+
+                            AuctionGui.openAuctionGui((Player) event.getWhoClicked(), page);
+                            break;
+
+                        case 49:
+                            event.getWhoClicked().sendMessage("Which item would you like to sell?");
+                            break;
                     }
                 }
             }

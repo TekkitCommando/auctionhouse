@@ -16,6 +16,12 @@ import java.util.Arrays;
 
 public class AuctionGui {
 
+    private static Inventory inv;
+
+    public static Inventory getInventory() {
+        return inv;
+    }
+
     /**
      * Opens the gui for the specified player at the specified page
      *
@@ -23,7 +29,7 @@ public class AuctionGui {
      * @param page   Page of the gui that will be seen
      */
     public static void openAuctionGui(Player player, int page) {
-        Inventory inv = Bukkit.createInventory(null, 27, ChatColor.GREEN + "Auction House");
+        inv = Bukkit.createInventory(null, 54, ChatColor.GREEN + "Auction House");
 
         try {
 
@@ -45,10 +51,10 @@ public class AuctionGui {
 
                 }
             }
-            setControlButtons(inv);
+            setControlButtons(inv, page);
             player.openInventory(inv);
 
-            RedisManager.getJedis().close();
+//            RedisManager.getJedis().close();
         } catch (JedisException e) {
             e.printStackTrace();
         }
@@ -73,31 +79,40 @@ public class AuctionGui {
         }
 
         ItemMeta im = is.getItemMeta();
-        im.setLore(Arrays.asList("ID: " + auctionItem.getId(), "Price: " + auctionItem.getPrice(), "Seller: " + Bukkit.getPlayer(auctionItem.getSeller()).getName()));
+        im.setLore(Arrays.asList(String.valueOf(auctionItem.getId()), String.valueOf(auctionItem.getPrice()), "Seller: " + Bukkit.getPlayer(auctionItem.getSeller()).getName()));
 
         is.setItemMeta(im);
 
         inv.setItem(slot, is);
     }
 
-    private static void setControlButtons(Inventory inv) {
-        ItemStack prev = new ItemStack(Material.ARROW);
-        ItemMeta prevMeta = prev.getItemMeta();
-        prevMeta.setDisplayName("Previous Page");
-        prev.setItemMeta(prevMeta);
+    private static void setControlButtons(Inventory inv, int page) {
+        if (page - 1 != 0) {
+            ItemStack prev = new ItemStack(Material.ARROW);
+            ItemMeta prevMeta = prev.getItemMeta();
+
+            prevMeta.setDisplayName(String.valueOf(page - 1));
+            prev.setItemMeta(prevMeta);
+
+            inv.setItem(45, prev);
+        }
 
         ItemStack add = new ItemStack(Material.ANVIL);
         ItemMeta addMeta = add.getItemMeta();
+
         addMeta.setDisplayName("Add Auction");
         add.setItemMeta(addMeta);
 
-        ItemStack next = new ItemStack(Material.ARROW);
-        ItemMeta nextMeta = next.getItemMeta();
-        nextMeta.setDisplayName("Next Page");
-        next.setItemMeta(nextMeta);
-
-        inv.setItem(45, prev);
         inv.setItem(49, add);
-        inv.setItem(53, next);
+
+        if (page + 1 < RedisManager.getRedisKeys().size()) {
+            ItemStack next = new ItemStack(Material.ARROW);
+            ItemMeta nextMeta = next.getItemMeta();
+
+            nextMeta.setDisplayName(String.valueOf(page + 1));
+            next.setItemMeta(nextMeta);
+
+            inv.setItem(53, next);
+        }
     }
 }
