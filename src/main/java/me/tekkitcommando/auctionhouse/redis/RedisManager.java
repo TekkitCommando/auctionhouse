@@ -8,18 +8,16 @@ import java.util.List;
 
 public class RedisManager {
 
-    private static Jedis jedis;
     private static List<String> redisKeys = new ArrayList<>();
+    private static JedisPool pool;
 
     public static void setupRedis() {
-        JedisPool pool = new JedisPool("localhost");
-        jedis = pool.getResource();
-//        jedis.auth("the-password");
+        pool = new JedisPool("localhost");
         getKeysFromDatabase();
     }
 
-    public static Jedis getJedis() {
-        return jedis;
+    public static JedisPool getPool() {
+        return pool;
     }
 
     public static List<String> getRedisKeys() {
@@ -31,9 +29,11 @@ public class RedisManager {
      * the string list for ease of access.
      */
     private static void getKeysFromDatabase() {
-        for (String key : getJedis().keys("*")) {
+        Jedis jedis = pool.getResource();
+        for (String key : jedis.keys("*")) {
             if (!getRedisKeys().contains(key))
                 getRedisKeys().add(key);
         }
+        jedis.close();
     }
 }

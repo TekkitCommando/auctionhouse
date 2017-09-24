@@ -16,10 +16,10 @@ import java.util.Arrays;
 
 public class AuctionGui {
 
-    private static Inventory inv;
+    private static Inventory auctionInv;
 
     public static Inventory getInventory() {
-        return inv;
+        return auctionInv;
     }
 
     /**
@@ -29,32 +29,30 @@ public class AuctionGui {
      * @param page   Page of the gui that will be seen
      */
     public static void openAuctionGui(Player player, int page) {
-        inv = Bukkit.createInventory(null, 54, ChatColor.GREEN + "Auction House");
+        auctionInv = Bukkit.createInventory(null, 54, ChatColor.GREEN + "Auction House");
 
         try {
 
             if (RedisManager.getRedisKeys().size() <= 44) {
 
                 for (int slot = 0; slot < RedisManager.getRedisKeys().size(); slot++)
-                    setInventoryItem(inv, slot);
+                    setInventoryItem(auctionInv, slot);
 
             } else {
                 if (page > 1) {
 
                     for (int slot = 44 + page; slot <= 44 * page; slot++)
-                        setInventoryItem(inv, slot);
+                        setInventoryItem(auctionInv, slot);
 
                 } else {
 
                     for (int slot = 0; slot <= 44; slot++)
-                        setInventoryItem(inv, slot);
+                        setInventoryItem(auctionInv, slot);
 
                 }
             }
-            setControlButtons(inv, page);
-            player.openInventory(inv);
-
-//            RedisManager.getJedis().close();
+            setControlButtons(auctionInv, page);
+            player.openInventory(auctionInv);
         } catch (JedisException e) {
             e.printStackTrace();
         }

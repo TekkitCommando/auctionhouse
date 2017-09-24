@@ -4,6 +4,7 @@ import me.tekkitcommando.auctionhouse.AuctionHouse;
 import me.tekkitcommando.auctionhouse.auction.AuctionItem;
 import me.tekkitcommando.auctionhouse.auction.AuctionManager;
 import me.tekkitcommando.auctionhouse.gui.AuctionGui;
+import me.tekkitcommando.auctionhouse.gui.SellGui;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -36,6 +37,7 @@ public class AuctionListener implements Listener {
 
                         if (purchaseItem(buyer, auctionItem)) {
                             sellItem(auctionItem);
+                            buyer.closeInventory();
                             AuctionManager.removeAuctionItem(auctionId);
                         }
                     }
@@ -51,7 +53,8 @@ public class AuctionListener implements Listener {
                             break;
 
                         case 49:
-                            event.getWhoClicked().sendMessage("Which item would you like to sell?");
+                            event.getWhoClicked().closeInventory();
+                            SellGui.openSellGui((Player) event.getWhoClicked(), null, 0, 0);
                             break;
                     }
                 }
