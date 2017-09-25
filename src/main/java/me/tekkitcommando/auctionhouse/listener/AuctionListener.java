@@ -54,7 +54,7 @@ public class AuctionListener implements Listener {
 
                         case 49:
                             event.getWhoClicked().closeInventory();
-                            SellGui.openSellGui((Player) event.getWhoClicked(), null, 0, 0);
+                            SellGui.openSellGui((Player) event.getWhoClicked());
                             break;
                     }
                 }

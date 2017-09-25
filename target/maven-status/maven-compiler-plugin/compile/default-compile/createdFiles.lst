@@ -1,9 +1,12 @@
 me\tekkitcommando\auctionhouse\auction\AuctionItem.class
+me\tekkitcommando\auctionhouse\gui\SellGui.class
+me\tekkitcommando\auctionhouse\listener\ChatListener.class
+me\tekkitcommando\auctionhouse\listener\ChatListener$1.class
+me\tekkitcommando\auctionhouse\redis\RedisManager.class
+me\tekkitcommando\auctionhouse\listener\AuctionListener.class
+me\tekkitcommando\auctionhouse\auction\AuctionItem$1.class
+me\tekkitcommando\auctionhouse\gui\AuctionGui.class
 me\tekkitcommando\auctionhouse\auction\AuctionManager.class
 me\tekkitcommando\auctionhouse\AuctionHouse.class
 me\tekkitcommando\auctionhouse\listener\SellListener.class
-me\tekkitcommando\auctionhouse\gui\SellGui.class
-me\tekkitcommando\auctionhouse\redis\RedisManager.class
 me\tekkitcommando\auctionhouse\command\AuctionCommand.class
-me\tekkitcommando\auctionhouse\listener\AuctionListener.class
-me\tekkitcommando\auctionhouse\gui\AuctionGui.class

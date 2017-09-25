@@ -1,6 +1,7 @@
 package me.tekkitcommando.auctionhouse.listener;
 
 import me.tekkitcommando.auctionhouse.auction.AuctionItem;
+import me.tekkitcommando.auctionhouse.auction.AuctionManager;
 import me.tekkitcommando.auctionhouse.gui.SellGui;
 import me.tekkitcommando.auctionhouse.redis.RedisManager;
 import org.bukkit.ChatColor;
@@ -15,19 +16,23 @@ public class SellListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getInventory().getName().equals(ChatColor.GREEN + "Click The Item To Sell")) {
+        if (event.getInventory().getName().equals(SellGui.getInventory().getName())) {
             ItemStack clicked = event.getCurrentItem();
             if (clicked.getType() != Material.AIR && clicked.getType() != null) {
                 event.setCancelled(true);
-                AuctionItem auctionItem = new AuctionItem(clicked, RedisManager.getRedisKeys().size() + 1, 0, event.getWhoClicked().getUniqueId(), 0.0);
-                SellGui.openSellGui((Player) event.getWhoClicked(), auctionItem, 0, 0);
-            }
-        } else if (event.getInventory().getName().equals(ChatColor.GREEN + "How many of that item?")) {
-            ItemStack clicked = event.getCurrentItem();
-            if (clicked.getType() != Material.AIR && clicked.getType() != null) {
-                event.setCancelled(true);
-                AuctionItem auctionItem = new AuctionItem(clicked, RedisManager.getRedisKeys().size() + 1, clicked.getAmount(), event.getWhoClicked().getUniqueId(), 0.0);
-                SellGui.openSellGui((Player) event.getWhoClicked(), auctionItem, auctionItem.getAmount(), 0);
+                if(clicked.getAmount() > 1) {
+                    AuctionItem auctionItem = new AuctionItem(clicked, RedisManager.getRedisKeys().size() + 1, 0, event.getWhoClicked().getUniqueId(), 0.0, 0);
+
+                    if(AuctionManager.addPendingAuction((Player) event.getWhoClicked(), auctionItem)) {
+                        event.getWhoClicked().sendMessage("Please type how many of the item in chat.");
+                    }
+                } else {
+                    AuctionItem auctionItem = new AuctionItem(clicked, RedisManager.getRedisKeys().size() + 1, 1, event.getWhoClicked().getUniqueId(), 0.0, 1);
+
+                    if(AuctionManager.addPendingAuction((Player) event.getWhoClicked(), auctionItem)) {
+                        event.getWhoClicked().sendMessage("Please type how much you want to sell it for.");
+                    }
+                }
             }
         }
     }

@@ -2,8 +2,10 @@ package me.tekkitcommando.auctionhouse.auction;
 
 import com.google.gson.Gson;
 import me.tekkitcommando.auctionhouse.redis.RedisManager;
+import org.bukkit.entity.Player;
 import redis.clients.jedis.Jedis;
 
+import javax.swing.text.PlainDocument;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +13,11 @@ public class AuctionManager {
 
     private static Gson gson = new Gson();
     private static Map<Integer, AuctionItem> auctionItems = new HashMap<>();
+    private static Map<Player, AuctionItem> pendingAuctions = new HashMap<>();
+
+    public static Map<Integer, AuctionItem> getAuctionItems() {
+        return auctionItems;
+    }
 
     public static void getItemsFromDatabase() {
         Jedis jedis = RedisManager.getPool().getResource();
@@ -40,13 +47,40 @@ public class AuctionManager {
         return null;
     }
 
+    public static void addAuctionItem(AuctionItem auctionItem) {
+        auctionItems.put(auctionItem.getId(), auctionItem);
+    }
+
     public static void removeAuctionItem(int id) {
         if (auctionItems.containsKey(id)) {
             auctionItems.remove(id);
         }
     }
 
-    public static void addAuctionItem(AuctionItem auctionItem) {
-        auctionItems.put(0, auctionItem);
+    public static Map<Player, AuctionItem> getPendingAuctions() {
+        return pendingAuctions;
+    }
+
+    public static AuctionItem getPendingAuction(Player player) {
+        if (pendingAuctions.containsKey(player)) {
+            return pendingAuctions.get(player);
+        } else {
+            return null;
+        }
+    }
+
+    public static boolean addPendingAuction(Player player, AuctionItem auctionItem) {
+        if (pendingAuctions.containsKey(player)) {
+            return false;
+        } else {
+            pendingAuctions.put(player, auctionItem);
+            return true;
+        }
+    }
+
+    public static void removePendingAuction(Player player) {
+        if (pendingAuctions.containsKey(player)) {
+            pendingAuctions.remove(player);
+        }
     }
 }
