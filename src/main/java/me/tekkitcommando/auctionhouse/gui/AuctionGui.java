@@ -2,7 +2,6 @@ package me.tekkitcommando.auctionhouse.gui;
 
 import me.tekkitcommando.auctionhouse.auction.AuctionItem;
 import me.tekkitcommando.auctionhouse.auction.AuctionManager;
-import me.tekkitcommando.auctionhouse.redis.RedisManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -74,6 +73,11 @@ public class AuctionGui {
 
         if (auctionItem.getItem() != null) {
             is = auctionItem.getItem();
+
+            if (auctionItem.getAmount() > 1) {
+                is.setAmount(auctionItem.getAmount());
+            }
+
         } else {
             return;
         }
@@ -105,7 +109,7 @@ public class AuctionGui {
 
         inv.setItem(49, add);
 
-        if (page + 1 < RedisManager.getRedisKeys().size()) {
+        if (page * 44 < AuctionManager.getAuctionItems().size()) {
             ItemStack next = new ItemStack(Material.ARROW);
             ItemMeta nextMeta = next.getItemMeta();
 

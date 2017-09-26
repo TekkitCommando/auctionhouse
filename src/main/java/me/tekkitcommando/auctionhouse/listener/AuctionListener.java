@@ -18,61 +18,60 @@ import redis.clients.jedis.Jedis;
 
 public class AuctionListener implements Listener {
 
-    /**
-     * Checks if player is clicking in the auction inventory and manages
-     * what they click.
-     *
-     * @param event Event called when an inventory is clicked in
-     */
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getInventory().getName().equals(AuctionGui.getInventory().getName())) {
-            ItemStack clicked = event.getCurrentItem();
             Player buyer = (Player) event.getWhoClicked();
+            event.setCancelled(true);
 
-            if (clicked.getType() != Material.AIR || clicked.getType() != null) {
-                event.setCancelled(true);
+            if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) {
+                return;
+            }
 
-                if (event.getSlot() != 45 && event.getSlot() != 49 && event.getSlot() != 53) {
-                    int auctionId = Integer.valueOf(event.getCurrentItem().getItemMeta().getLore().get(0));
+            ItemStack clicked = event.getCurrentItem();
+
+            if (event.getSlot() <= 44 && clicked.hasItemMeta()) {
+                int auctionId = Integer.valueOf(clicked.getItemMeta().getLore().get(0));
+
+                if (AuctionManager.getAuctionItem(auctionId) != null) {
                     AuctionItem auctionItem = AuctionManager.getAuctionItem(auctionId);
 
-                    if (auctionItem != null) {
-
-                        if (buyer == Bukkit.getPlayer(auctionItem.getSeller())) {
-                            buyer.sendMessage(ChatColor.RED + "[Auction House] You cannot purchase your own auction item!");
-                            return;
-                        }
-
-                        if (purchaseItem(buyer, auctionItem)) {
-                            Jedis jedis = RedisManager.getPool().getResource();
-
-                            sellItem(auctionItem);
-                            buyer.closeInventory();
-                            AuctionManager.removeAuctionItem(auctionId);
-                            RedisManager.getRedisKeys().remove(String.valueOf(auctionId));
-
-                            jedis.del(String.valueOf(auctionId));
-                        }
+                    if (buyer == Bukkit.getPlayer(auctionItem.getSeller())) {
+                        buyer.sendMessage(ChatColor.RED + "[Auction House] You cannot purchase your own auction item!");
+                        return;
                     }
 
-                } else {
+                    if (purchaseItem(buyer, auctionItem)) {
+                        Jedis jedis = RedisManager.getPool().getResource();
 
-                    switch (event.getSlot()) {
-                        case 45:
-                        case 53:
-                            int page = Integer.valueOf(event.getCurrentItem().getItemMeta().getDisplayName());
+                        sellItem(auctionItem);
+                        buyer.closeInventory();
+                        AuctionManager.removeAuctionItem(auctionId);
+                        RedisManager.getRedisKeys().remove(String.valueOf(auctionId));
 
-                            buyer.closeInventory();
-
-                            AuctionGui.openAuctionGui((Player) buyer, page);
-                            break;
-
-                        case 49:
-                            buyer.closeInventory();
-                            SellGui.openSellGui((Player) buyer);
-                            break;
+                        jedis.del(String.valueOf(auctionId));
+                        jedis.close();
                     }
+                }
+
+            } else {
+
+                switch (event.getSlot()) {
+                    case 45:
+                    case 53:
+                        int page = Integer.valueOf(clicked.getItemMeta().getDisplayName());
+
+                        buyer.closeInventory();
+
+                        AuctionGui.openAuctionGui(buyer, page);
+                        break;
+
+                    case 49:
+                        buyer.closeInventory();
+                        SellGui.openSellGui(buyer);
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -88,9 +87,17 @@ public class AuctionListener implements Listener {
     private boolean purchaseItem(Player buyer, AuctionItem auctionItem) {
         if (AuctionHouse.getEconomy().has(buyer, auctionItem.getPrice())) {
             AuctionHouse.getEconomy().withdrawPlayer(buyer, auctionItem.getPrice());
-            buyer.getInventory().addItem(auctionItem.getItem());
 
-            if (auctionItem.getItem().getItemMeta().getDisplayName() == null) {
+            if (auctionItem.getAmount() > 1) {
+                ItemStack item = auctionItem.getItem();
+                item.setAmount(auctionItem.getAmount());
+                buyer.getInventory().addItem(item);
+
+            } else {
+                buyer.getInventory().addItem(auctionItem.getItem());
+            }
+
+            if (auctionItem.getItem().getItemMeta() == null) {
                 buyer.sendMessage(ChatColor.GREEN + "[Auction House] You have successfully bought the auction(s) " + auctionItem.getItem().getType() + "!");
 
             } else {
@@ -116,7 +123,7 @@ public class AuctionListener implements Listener {
         if (Bukkit.getOfflinePlayer(auctionItem.getSeller()).isOnline()) {
             Player player = Bukkit.getServer().getPlayer(auctionItem.getSeller());
 
-            if (auctionItem.getItem().getItemMeta().getDisplayName() == null) {
+            if (auctionItem.getItem().getItemMeta() == null) {
                 player.sendMessage(ChatColor.GREEN + "[Auction House] Your auction(s) " + auctionItem.getItem().getItemMeta().getDisplayName() + "was purchased!");
 
             } else {

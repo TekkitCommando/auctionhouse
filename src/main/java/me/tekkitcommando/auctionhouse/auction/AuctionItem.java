@@ -35,6 +35,10 @@ public class AuctionItem {
         return itemStack;
     }
 
+    public void setItem(ItemStack item) {
+        this.itemStack = item;
+    }
+
     public String getItemType() {
         return item;
     }

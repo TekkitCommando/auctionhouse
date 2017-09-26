@@ -3,10 +3,12 @@ package me.tekkitcommando.auctionhouse.listener;
 import me.tekkitcommando.auctionhouse.auction.AuctionManager;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class ChatListener implements Listener {
 
@@ -19,7 +21,8 @@ public class ChatListener implements Listener {
 
             if (AuctionManager.getPendingAuction(player).getAmount() == 0) {
                 if (NumberUtils.isNumber(event.getMessage())) {
-                    if (player.getInventory().containsAtLeast(AuctionManager.getPendingAuction(player).getItem(), Integer.valueOf(event.getMessage()))) {
+                    ItemStack item = new ItemStack(Material.getMaterial(AuctionManager.getPendingAuction(player).getItemType()));
+                    if (player.getInventory().containsAtLeast(item, Integer.valueOf(event.getMessage()))) {
                         AuctionManager.getPendingAuction(player).setAmount(Integer.valueOf(event.getMessage()));
                         player.sendMessage(ChatColor.GREEN + "Amount added! Now please specify your price.");
                     } else {
@@ -48,8 +51,13 @@ public class ChatListener implements Listener {
                     }
 
                     AuctionManager.getPendingAuction(player).setupAuction();
-
                     AuctionManager.addAuctionItem(AuctionManager.getPendingAuction(player));
+
+                    ItemStack item = AuctionManager.getPendingAuction(player).getItem();
+                    item.setAmount(AuctionManager.getPendingAuction(player).getAmount());
+
+                    player.getInventory().remove(item);
+
                     AuctionManager.removePendingAuction(player);
 
                     player.sendMessage(ChatColor.GREEN + "[Auction House] Auction added!");
