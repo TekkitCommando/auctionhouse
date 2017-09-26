@@ -33,12 +33,13 @@ public class AuctionGui {
 
         try {
 
-            if (RedisManager.getRedisKeys().size() <= 44) {
+            if (AuctionManager.getAuctionItems().size() <= 44) {
 
-                for (int slot = 0; slot < RedisManager.getRedisKeys().size(); slot++)
+                for (int slot = 0; slot < AuctionManager.getAuctionItems().size(); slot++)
                     setInventoryItem(auctionInv, slot);
 
             } else {
+
                 if (page > 1) {
 
                     for (int slot = 44 + page; slot <= 44 * page; slot++)
@@ -51,6 +52,7 @@ public class AuctionGui {
 
                 }
             }
+
             setControlButtons(auctionInv, page);
             player.openInventory(auctionInv);
         } catch (JedisException e) {
@@ -70,7 +72,7 @@ public class AuctionGui {
         AuctionItem auctionItem = AuctionManager.getAuctionItem(slot);
         ItemStack is;
 
-        if (auctionItem != null) {
+        if (auctionItem.getItem() != null) {
             is = auctionItem.getItem();
         } else {
             return;

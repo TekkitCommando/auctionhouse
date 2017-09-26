@@ -30,10 +30,14 @@ public class RedisManager {
      */
     private static void getKeysFromDatabase() {
         Jedis jedis = pool.getResource();
+
         for (String key : jedis.keys("*")) {
+
             if (!getRedisKeys().contains(key))
                 getRedisKeys().add(key);
+
         }
+
         jedis.close();
     }
 }

@@ -3,6 +3,8 @@ package me.tekkitcommando.auctionhouse;
 import me.tekkitcommando.auctionhouse.auction.AuctionManager;
 import me.tekkitcommando.auctionhouse.command.AuctionCommand;
 import me.tekkitcommando.auctionhouse.listener.AuctionListener;
+import me.tekkitcommando.auctionhouse.listener.ChatListener;
+import me.tekkitcommando.auctionhouse.listener.SellListener;
 import me.tekkitcommando.auctionhouse.redis.RedisManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -26,10 +28,11 @@ public class AuctionHouse extends JavaPlugin {
 
     private void setEconomy() {
         RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+
         if (economyProvider != null) {
             economy = economyProvider.getProvider();
         } else {
-            logger.warning("Could not hook into Vault!");
+            logger.warning("Could not hook into Vault! Make sure it is installed along with an Economy plugin.");
         }
     }
 
@@ -39,6 +42,8 @@ public class AuctionHouse extends JavaPlugin {
 
     private void setupEvents() {
         getServer().getPluginManager().registerEvents(new AuctionListener(), this);
+        getServer().getPluginManager().registerEvents(new SellListener(), this);
+        getServer().getPluginManager().registerEvents(new ChatListener(), this);
     }
 
     /**

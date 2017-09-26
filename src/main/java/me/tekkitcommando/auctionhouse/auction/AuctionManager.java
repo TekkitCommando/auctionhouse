@@ -5,7 +5,6 @@ import me.tekkitcommando.auctionhouse.redis.RedisManager;
 import org.bukkit.entity.Player;
 import redis.clients.jedis.Jedis;
 
-import javax.swing.text.PlainDocument;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,23 +20,34 @@ public class AuctionManager {
 
     public static void getItemsFromDatabase() {
         Jedis jedis = RedisManager.getPool().getResource();
+
         for (String key : RedisManager.getRedisKeys()) {
             String item = jedis.get(key);
+
             AuctionItem auctionItem = gson.fromJson(item, AuctionItem.class);
+            auctionItem.setupAuction();
 
             auctionItems.put(auctionItem.getId(), auctionItem);
         }
+
         jedis.close();
     }
 
     public static void saveItemsToDatabase() {
-        Jedis jedis = RedisManager.getPool().getResource();
-        for (AuctionItem auctionItem : auctionItems.values()) {
-            String auction = gson.toJson(auctionItem);
-            jedis.set(String.valueOf(auctionItem.getId()), auction);
-            System.out.println(auction);
+        if (AuctionManager.getAuctionItems().size() > 0) {
+            Jedis jedis = RedisManager.getPool().getResource();
+
+            for (AuctionItem auctionItem : auctionItems.values()) {
+                String auction = gson.toJson(auctionItem);
+                System.out.println(auction);
+
+                jedis.set(String.valueOf(auctionItem.getId()), auction);
+            }
+
+            jedis.close();
+        } else {
+            System.out.println("No auction items to export!");
         }
-        jedis.close();
     }
 
     public static AuctionItem getAuctionItem(int id) {

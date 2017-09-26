@@ -1,5 +1,6 @@
 package me.tekkitcommando.auctionhouse.auction;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
@@ -7,24 +8,18 @@ import java.util.concurrent.*;
 
 public class AuctionItem {
 
-    private ItemStack item;
+    private String item;
+    private transient ItemStack itemStack;
     private int id;
     private int amount;
     private UUID seller;
     private double price;
     private int hours;
-    private ScheduledExecutorService scheduler;
-    private ScheduledFuture scheduledTask;
+    private transient ScheduledExecutorService scheduler;
+    private transient ScheduledFuture scheduledTask;
 
-    public AuctionItem(ItemStack item, final int id, int amount, UUID seller, double price, int hours) {
-        this.item = item;
-        this.id = id;
-        this.amount = amount;
-        this.seller = seller;
-        this.price = price;
-        this.hours = hours;
-
-        AuctionManager.addAuctionItem(this);
+    public void setupAuction() {
+        itemStack = new ItemStack(Material.getMaterial(item));
 
         scheduler = Executors.newScheduledThreadPool(5);
         scheduledTask = scheduler.schedule(new Callable() {
@@ -37,7 +32,15 @@ public class AuctionItem {
     }
 
     public ItemStack getItem() {
+        return itemStack;
+    }
+
+    public String getItemType() {
         return item;
+    }
+
+    public void setItemType(String item) {
+        this.item = item;
     }
 
     public int getId() {

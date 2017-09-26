@@ -16,13 +16,28 @@ public class SellGui {
 
     public static void openSellGui(Player player) {
         int slot = 0;
+        int size = 9;
 
-        sellInv = Bukkit.createInventory(null, player.getInventory().getSize(), ChatColor.GREEN + "Click The Item To Sell");
+        if (player.getInventory().getSize() > 9) {
+
+            if (player.getInventory().getSize() % 9 == 0) {
+                size = player.getInventory().getSize();
+
+            } else {
+                int remainder = player.getInventory().getSize() % 9;
+                int extraSlots = 9 - remainder;
+                size = player.getInventory().getSize() + extraSlots;
+            }
+        }
+
+        sellInv = Bukkit.createInventory(null, size, ChatColor.GREEN + "Click The Item To Sell");
 
         for (int i = 0; i < player.getInventory().getSize(); i++) {
+
             if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() != Material.AIR) {
                 sellInv.setItem(slot, player.getInventory().getItem(i));
                 slot++;
+
             }
         }
 
