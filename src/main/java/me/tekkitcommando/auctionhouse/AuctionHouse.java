@@ -26,6 +26,10 @@ public class AuctionHouse extends JavaPlugin {
         return economy;
     }
 
+    /**
+     * Hooks the plugin with Vault, if Vault (or an Economy plugin) cannot be found
+     * it will log a warning to the console and disable the plugin
+     */
     private void setEconomy() {
         RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
 
@@ -33,13 +37,21 @@ public class AuctionHouse extends JavaPlugin {
             economy = economyProvider.getProvider();
         } else {
             logger.warning("Could not hook into Vault! Make sure it is installed along with an Economy plugin.");
+            getServer().getPluginManager().disablePlugin(this);
         }
     }
 
+    /**
+     * Sets the command executor for the 'auction' command
+     */
     private void setupCommands() {
         getCommand("auction").setExecutor(new AuctionCommand());
     }
 
+    /**
+     * Registers the events for clicking in the auction gui and sell gui and also setting
+     * up an auction item through chat
+     */
     private void setupEvents() {
         getServer().getPluginManager().registerEvents(new AuctionListener(), this);
         getServer().getPluginManager().registerEvents(new SellListener(), this);
@@ -47,7 +59,7 @@ public class AuctionHouse extends JavaPlugin {
     }
 
     /**
-     * Handles the enabling of the plugin when the server is started
+     * Setup for all parts of the auction house when the plugin is enabled
      */
     @Override
     public void onEnable() {
@@ -70,7 +82,7 @@ public class AuctionHouse extends JavaPlugin {
     }
 
     /**
-     * Handles the disabling of the plugin when the server is stopped
+     * Saves all auctions to the redis database before the plugin is disabled
      */
     @Override
     public void onDisable() {

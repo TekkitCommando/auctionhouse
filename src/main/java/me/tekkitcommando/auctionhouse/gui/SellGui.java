@@ -10,10 +10,22 @@ public class SellGui {
 
     private static Inventory sellInv;
 
+    /**
+     * Allows access to the inventory gui that is built in the openSellGui function
+     *
+     * @return The sell inventory gui
+     */
     public static Inventory getInventory() {
         return sellInv;
     }
 
+    /**
+     * Opens and builds the sell gui based on how many things could be sold in the players
+     * inventory. Could be useful if you wanted to add a item whitelist for things
+     * that can be sold
+     *
+     * @param player The player preparing to sell an item
+     */
     public static void openSellGui(Player player) {
         int slot = 0;
         int size = 9;

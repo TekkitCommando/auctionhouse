@@ -12,6 +12,13 @@ import org.bukkit.inventory.ItemStack;
 
 public class ChatListener implements Listener {
 
+    /**
+     * Checks if the player that sent the chat message is in pending auction mode,
+     * if they are, cancel the event and configure the auction so it can be added to
+     * the list of auction items ready to be purchased
+     *
+     * @param event The event that is called when a player sends a chat message
+     */
     @EventHandler
     public void onPlayerChat(final AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();

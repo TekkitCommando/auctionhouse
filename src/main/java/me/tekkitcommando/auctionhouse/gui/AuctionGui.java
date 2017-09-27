@@ -17,12 +17,17 @@ public class AuctionGui {
 
     private static Inventory auctionInv;
 
+    /**
+     * Allows access to the inventory gui that is built in the openAuctionGui function
+     *
+     * @return The auction inventory gui
+     */
     public static Inventory getInventory() {
         return auctionInv;
     }
 
     /**
-     * Opens the gui for the specified player at the specified page
+     * Opens and builds the gui for the specified player at the specified page
      *
      * @param player Player that will see the gui
      * @param page   Page of the gui that will be seen
@@ -61,7 +66,7 @@ public class AuctionGui {
 
     /**
      * Sets the gui slot to the retrieved Auction Item based on
-     * the slot.
+     * the slot number
      *
      * @param inv  The gui to set the auction item in
      * @param slot The slot where the auction item will be
@@ -83,13 +88,20 @@ public class AuctionGui {
         }
 
         ItemMeta im = is.getItemMeta();
-        im.setLore(Arrays.asList(String.valueOf(auctionItem.getId()), String.valueOf(auctionItem.getPrice()), "Seller: " + Bukkit.getPlayer(auctionItem.getSeller()).getName()));
+        im.setLore(Arrays.asList(String.valueOf(auctionItem.getId()), String.valueOf(auctionItem.getPrice()), "Seller: " + Bukkit.getPlayer(auctionItem.getSeller()).getName(), String.valueOf(auctionItem.getTimeLeft())));
 
         is.setItemMeta(im);
 
         inv.setItem(slot, is);
     }
 
+    /**
+     * Creates control items based on whether or not there could be a previous
+     * and next page and also adds a 'Add Auction' item for creating an auction
+     *
+     * @param inv The inventory to set the item in
+     * @param page The page that the gui is building
+     */
     private static void setControlButtons(Inventory inv, int page) {
         if (page - 1 != 0) {
             ItemStack prev = new ItemStack(Material.ARROW);

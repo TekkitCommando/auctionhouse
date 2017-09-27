@@ -18,6 +18,13 @@ import redis.clients.jedis.Jedis;
 
 public class AuctionListener implements Listener {
 
+    /**
+     * Checks if the event was caused by clicking in the auction gui if so,
+     * get the item and slot clicked on and decide whether to sell clicked item
+     * or if it is a control item such as the 'Add Auction' item.
+     *
+     * @param event The event that is called when an inventory is clicked in
+     */
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getInventory().getName().equals(AuctionGui.getInventory().getName())) {
@@ -79,10 +86,10 @@ public class AuctionListener implements Listener {
 
     /**
      * Checks if player has enough money and if he or she does then
-     * take the money and give him or her the auction
+     * take the money and give him or her the auction item
      *
      * @param buyer       The buyer of the auction
-     * @param auctionItem The auction being auctioned
+     * @param auctionItem The item being auctioned
      */
     private boolean purchaseItem(Player buyer, AuctionItem auctionItem) {
         if (AuctionHouse.getEconomy().has(buyer, auctionItem.getPrice())) {
@@ -113,7 +120,8 @@ public class AuctionListener implements Listener {
     }
 
     /**
-     * Gives the seller of the specified auction auction money from the purchase
+     * Gives the seller of the specified auction the money from the purchase
+     * and sends a message notifying the player if he or she is online
      *
      * @param auctionItem The auction being auctioned
      */
